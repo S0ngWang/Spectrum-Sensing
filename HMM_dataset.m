@@ -7,10 +7,10 @@ clc;
 K = 2;  % Number of maximum subbands
 mu = 0.0571;
 
-R = 10000;
+R = 5000;
 
 N = 2 ^ K; % Number of states/results
-T = R / 2;    % Number of trainning samples
+T = 5000;    % Number of trainning samples
 acc_list = zeros(21, 1);
 
 %% Load dataset
@@ -21,8 +21,8 @@ for r = 1:21
     seq = bi2de(obstate_mat(:, :, r) - 1) + 1;
     tstate = bi2de(tstate_mat(:, :, r) - 1) + 1;
     
-    train_seq = seq(1:5000);
-    train_state = tstate(1:5000);
+    train_seq = seq(1:R);
+    train_state = tstate(1:R);
     
     %% Train HMM on training sequence
     tic;
@@ -40,15 +40,18 @@ for r = 1:21
     toc;
     infr_time = toc;
     
-    psstate = zeros(R, 1);
+    psstate = zeros(R + T, 1);
     
-    for i = 1:R
-        psstate(i) = find(psstate_prob(:, i) == max(psstate_prob(:, i)));
+    for i = 1:R + T
+        psstate(i) = find(psstate_prob(:, i) == max(psstate_prob(:, i)), 1);
     end
     
     %% Calculate accurcy
-    accurcy = sum(psstate(T + 1:end) == tstate(T + 1:end)) * 100 / 5000;
+    accurcy = sum(psstate == tstate) * 100 / (R + T);
     acc_list(r) = accurcy;
     
     fprintf('%d subbands, %d states, Prediction accurcy: %.2f%%\n\n',K, N, accurcy);
 end
+
+plot(-20:2:20, acc_list / 100);
+ylim([0 Inf]);

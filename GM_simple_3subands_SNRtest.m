@@ -28,7 +28,7 @@ for r = 1:21
     load('tstate_mat.mat');
     load('obstate_mat.mat');
     
-    seq = zeros(10000, N);
+    seq = zeros(seq_size + test_size, N);
     for i = 1:K
         seq(:, i*2-1) = obstate_mat(:, i, r);
         seq(:, i*2) = tstate_mat(:, i, r);
