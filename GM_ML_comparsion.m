@@ -5,7 +5,21 @@ clc;
 
 %% Parameters
 load('tstate_mat.mat');
-load('obstate_mat.mat');
+
+load('power_mat.mat');
+
+obstate_mat = zeros(size(tstate_mat));
+
+seq_size = size(tstate_mat, 1);
+K = size(tstate_mat, 2);
+
+for i = 1:21
+    power_vec = power_mat(:, :, i);
+     obstate = power_vec > 1 + ones(seq_size, 1) * (sum(tstate_mat(:, :, i) == 1) / seq_size);
+    obstate = power_vec > 1.5;
+    obstate = obstate + 1;
+    obstate_mat(:, :, i) = obstate;
+end
 
 comp_mat = tstate_mat == obstate_mat;
 acc_list = zeros(size(tstate_mat, 3), 1);
